@@ -40,9 +40,24 @@ class Users
     #[ORM\OneToMany(mappedBy: 'user_id', targetEntity: Cv::class, orphanRemoval: true)]
     private Collection $cvs;
 
+    #[ORM\OneToOne(mappedBy: 'users_id', cascade: ['persist', 'remove'])]
+    private ?SocialMedia $socialMedia = null;
+
+    #[ORM\OneToMany(mappedBy: 'users_id', targetEntity: PreviousJob::class, orphanRemoval: true)]
+    private Collection $previousJobs;
+
+    #[ORM\OneToMany(mappedBy: 'usersId', targetEntity: Comments::class, orphanRemoval: true)]
+    private Collection $comments;
+
+    #[ORM\OneToMany(mappedBy: 'usersId', targetEntity: UsersLikedVacancies::class, orphanRemoval: true)]
+    private Collection $usersLikedVacancies;
+
     public function __construct()
     {
         $this->cvs = new ArrayCollection();
+        $this->previousJobs = new ArrayCollection();
+        $this->comments = new ArrayCollection();
+        $this->usersLikedVacancies = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -158,6 +173,113 @@ class Users
             // set the owning side to null (unless already changed)
             if ($cv->getUserId() === $this) {
                 $cv->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getSocialMedia(): ?SocialMedia
+    {
+        return $this->socialMedia;
+    }
+
+    public function setSocialMedia(SocialMedia $socialMedia): self
+    {
+        // set the owning side of the relation if necessary
+        if ($socialMedia->getUsersId() !== $this) {
+            $socialMedia->setUsersId($this);
+        }
+
+        $this->socialMedia = $socialMedia;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PreviousJob>
+     */
+    public function getPreviousJobs(): Collection
+    {
+        return $this->previousJobs;
+    }
+
+    public function addPreviousJob(PreviousJob $previousJob): self
+    {
+        if (!$this->previousJobs->contains($previousJob)) {
+            $this->previousJobs->add($previousJob);
+            $previousJob->setUsersId($this);
+        }
+
+        return $this;
+    }
+
+    public function removePreviousJob(PreviousJob $previousJob): self
+    {
+        if ($this->previousJobs->removeElement($previousJob)) {
+            // set the owning side to null (unless already changed)
+            if ($previousJob->getUsersId() === $this) {
+                $previousJob->setUsersId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Comments>
+     */
+    public function getComments(): Collection
+    {
+        return $this->comments;
+    }
+
+    public function addComment(Comments $comment): self
+    {
+        if (!$this->comments->contains($comment)) {
+            $this->comments->add($comment);
+            $comment->setUsersId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComment(Comments $comment): self
+    {
+        if ($this->comments->removeElement($comment)) {
+            // set the owning side to null (unless already changed)
+            if ($comment->getUsersId() === $this) {
+                $comment->setUsersId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UsersLikedVacancies>
+     */
+    public function getUsersLikedVacancies(): Collection
+    {
+        return $this->usersLikedVacancies;
+    }
+
+    public function addUsersLikedVacancy(UsersLikedVacancies $usersLikedVacancy): self
+    {
+        if (!$this->usersLikedVacancies->contains($usersLikedVacancy)) {
+            $this->usersLikedVacancies->add($usersLikedVacancy);
+            $usersLikedVacancy->setUsersId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUsersLikedVacancy(UsersLikedVacancies $usersLikedVacancy): self
+    {
+        if ($this->usersLikedVacancies->removeElement($usersLikedVacancy)) {
+            // set the owning side to null (unless already changed)
+            if ($usersLikedVacancy->getUsersId() === $this) {
+                $usersLikedVacancy->setUsersId(null);
             }
         }
 
